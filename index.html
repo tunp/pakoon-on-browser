@@ -22,20 +22,84 @@
       img {
         max-width: 100vw;
       }
+      #playroom_cont {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        visibility: hidden;
+        background-color: black;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+      }
+      #fullscreen_btn {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+      }
+      /* Locking with Firefox gives "NotSupportedError: Operation is not supported", so need to do this hack */
+      @media only screen and (orientation:portrait) {
+        #playroom_cont {
+            height: 100vw;
+            width: 100vh;
+            transform: translate(-50vh, -50vw) rotate(90deg) translate(50vh, -50vw);
+        }
+      }
     </style>
+    <script>
+        window.addEventListener("load", () => {
+            const playroom_cont = document.querySelector('#playroom_cont');
+            const iframe = document.querySelector('iframe');
+            const fullscreen_btn = document.querySelector("#fullscreen_btn");
+            iframe.src = "about:blank";
+            document.querySelectorAll('.goplay').forEach(link => {
+                link.addEventListener("click", () => {
+                    playroom_cont.style.visibility = "visible";
+                    document.documentElement.requestFullscreen();
+                    iframe.contentWindow.focus();
+                });
+            });
+            iframe.addEventListener("load", () => {
+                if (iframe.contentWindow.location.href === "about:blank") {
+                    playroom_cont.style.visibility = "hidden";
+                    fullscreen_btn.style.visibility = "hidden";
+                    document.exitFullscreen().catch(() => {});
+                }
+            });
+            document.addEventListener("fullscreenchange", function() {
+                if (document.fullscreenElement) {
+                    screen.orientation.lock("landscape-primary").catch(error => consoconsole.logg(error));
+                    fullscreen_btn.style.visibility = "hidden";
+                } else {
+                    fullscreen_btn.style.visibility = "visible";
+                }
+            });
+            fullscreen_btn.addEventListener('click', () => {
+                document.documentElement.requestFullscreen();
+                iframe.contentWindow.focus();
+            });
+        });
+    </script>
   </head>
   <body>
-      <a href="Pakoon2/Pakoon.html">
+      <a href="Pakoon2/Pakoon.html" class="goplay" target="playroom">
           <div class="inner">Pakoon2</div>
           <img src="Pakoon2.jpg" alt="Pakoon2">
       </a>
-      <a href="Pakoon1/Pakoon.html">
+      <a href="Pakoon1/Pakoon.html" class="goplay" target="playroom">
           <div class="inner">Pakoon1</div>
           <img src="Pakoon1.jpg" alt="Pakoon1">
       </a>
-      <a href="Pakoon0/Pakoon.html">
+      <a href="Pakoon0/Pakoon.html" class="goplay" target="playroom">
           <div class="inner">Pakoon0</div>
           <img src="Pakoon0.jpg" alt="Pakoon0">
       </a>
+      <div id="playroom_cont">
+          <iframe name="playroom" frameBorder="0"></iframe>
+          <button id="fullscreen_btn">Go to fullscreen</button>
+      </div>
   </body>
 </html>
