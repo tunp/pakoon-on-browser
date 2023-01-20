@@ -71,7 +71,7 @@
             });
             document.addEventListener("fullscreenchange", function() {
                 if (document.fullscreenElement) {
-                    screen.orientation.lock("landscape-primary").catch(error => consoconsole.logg(error));
+                    screen.orientation.lock("landscape-primary").catch(error => console.log(error));
                     fullscreen_btn.style.visibility = "hidden";
                 } else {
                     fullscreen_btn.style.visibility = "visible";
